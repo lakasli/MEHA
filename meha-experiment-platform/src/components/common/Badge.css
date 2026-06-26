@@ -1,0 +1,56 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+  background-color: transparent;
+  color: var(--ink-muted);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.badge--neutral { color: var(--ink-muted); border-color: var(--rule); }
+
+.badge--active {
+  color: var(--terracotta);
+  border-color: var(--terracotta-soft);
+  background-color: var(--terracotta-wash);
+}
+
+.badge--done {
+  color: var(--sage);
+  border-color: var(--sage-soft);
+  background-color: #eef1ec;
+}
+
+.badge--warning {
+  color: #8a5a1a;
+  border-color: var(--ember-soft);
+  background-color: #f7eede;
+}
+
+.badge--error {
+  color: var(--terracotta);
+  border-color: var(--terracotta);
+  background-color: var(--terracotta-wash);
+}
+
+.badge--ours {
+  color: var(--ink-on-accent);
+  border-color: var(--terracotta);
+  background-color: var(--terracotta);
+  font-weight: 600;
+}

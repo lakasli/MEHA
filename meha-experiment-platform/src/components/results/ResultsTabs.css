@@ -1,0 +1,86 @@
+/* ============================================================
+   ResultsTabs — editorial section switcher.
+   Each tab carries its paper section number as an eyebrow above
+   the label. Active tab is marked by an ink underline, not a
+   filled background — keeps the column quiet.
+   ============================================================ */
+
+.results-tabs {
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: var(--space-6);
+}
+
+.results-tabs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.results-tabs__item {
+  flex-shrink: 0;
+}
+
+.results-tabs__tab {
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--space-3) var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  cursor: pointer;
+  color: var(--ink-muted);
+  transition: color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+  font-family: inherit;
+  margin-bottom: -1px; /* overlap the strip's bottom border */
+}
+
+.results-tabs__tab:hover {
+  color: var(--ink);
+}
+
+.results-tabs__tab:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.results-tabs__tab--active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.results-tabs__section {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--ink-faint);
+}
+
+.results-tabs__tab--active .results-tabs__section {
+  color: var(--terracotta);
+}
+
+.results-tabs__label {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: var(--tracking-tight);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .results-tabs__label {
+    font-size: var(--text-xs);
+  }
+  .results-tabs__tab {
+    padding: var(--space-2) var(--space-3);
+  }
+}

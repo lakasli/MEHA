@@ -1,0 +1,24 @@
+/* ============================================================
+   App — topbar run-status aside.
+   ============================================================ */
+
+.app__topbar-run {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 180px;
+}
+
+.app__topbar-run-label {
+  flex-shrink: 0;
+  color: var(--ink-muted);
+}
+
+.app__topbar-run .progress {
+  flex: 1;
+  min-width: 0;
+}
+
+.app__topbar-run .progress__track {
+  height: 4px;
+}

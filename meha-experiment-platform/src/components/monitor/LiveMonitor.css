@@ -1,0 +1,94 @@
+/* ============================================================
+   LiveMonitor — composes the MQTT transcript (signature) with
+   the fleet summary + AGV card grid. The transcript is the
+   primary column; the fleet is the supporting aside.
+   ============================================================ */
+
+.live-monitor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.live-monitor__inline {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background-color: var(--surface-sunk);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  letter-spacing: 0;
+}
+
+.live-monitor__hint {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  color: var(--ink-muted);
+}
+
+/* ---- Two-column layout: transcript | aside ---- */
+.live-monitor__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.live-monitor__transcript-card {
+  /* The transcript card should be tall enough to feel like a live pane. */
+  min-height: 540px;
+}
+
+.live-monitor__transcript-card .card__body {
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.live-monitor__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  position: sticky;
+  top: calc(var(--topbar-height) + var(--archstrip-height) + var(--space-4));
+}
+
+/* ---- AGV card grid: 2 columns inside the aside ---- */
+.live-monitor__fleet-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.live-monitor__note {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.live-monitor__note--error {
+  color: var(--terracotta);
+  font-style: normal;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 1080px) {
+  .live-monitor__grid {
+    grid-template-columns: 1fr;
+  }
+  .live-monitor__aside {
+    position: static;
+  }
+  .live-monitor__transcript-card {
+    min-height: 480px;
+  }
+}
+
+@media (max-width: 720px) {
+  .live-monitor__fleet-grid {
+    grid-template-columns: 1fr;
+  }
+}

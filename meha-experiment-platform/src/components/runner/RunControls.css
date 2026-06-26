@@ -1,0 +1,86 @@
+.run-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.run-controls__buttons {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* ---- Stage list ----
+   The stage numbers are a real sequence (connect → dispatch → collect →
+   compute → done), so ordered-list markers carry meaning here. */
+.run-controls__stages {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-4);
+}
+
+.run-controls__stage {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  position: relative;
+}
+
+.run-controls__stage::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 24px;
+  bottom: -8px;
+  width: 1px;
+  background-color: var(--rule);
+}
+.run-controls__stage:last-child::before { display: none; }
+
+.run-controls__stage-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background-color: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  z-index: 1;
+}
+
+.run-controls__stage--done .run-controls__stage-marker {
+  background-color: var(--sage);
+  border-color: var(--sage);
+  color: var(--ink-on-accent);
+}
+
+.run-controls__stage--active .run-controls__stage-marker {
+  background-color: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--ink-on-accent);
+}
+
+.run-controls__stage-label {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  line-height: var(--leading-snug);
+}
+
+.run-controls__stage--active .run-controls__stage-label {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.run-controls__stage--done .run-controls__stage-label {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-faint);
+}

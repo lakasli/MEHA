@@ -18,6 +18,9 @@
 | Type 2 | **F** | 叉车 (Forklift AGV) | 单件负载 (K_F = 1) | 2.0×1.2×2.5 | 800 |
 | Type 3 | **B** | 料箱车 (Bin-carrying AGV) | 多件负载 (K_B ≥ 1, 可配置) | 1.5×1.0×1.8 | 400 |
 
+> **仿真平台具体车型（SEER潜伏车，对应 Type L）**：  
+> 本实验平台采用 SEER 潜伏车作为 Type L 的实例化，其事实表参数为 `length=1.03m, width=0.745m, height∈[0.01,0.1]m`，与上表 Type L 典型值接近。三类车辆的运动学/电力参数均可在配置中按类型差异化设定。
+
 ```
 每辆AGV aᵢ 的类型属性:
   type(aᵢ) ∈ T
@@ -44,6 +47,18 @@
   ∀a, ∀t:  |dv/dt| ≤ a_acc(type)  (加速)
   ∀a, ∀t:  |dv/dt| ≤ a_dec(type)  (减速)
   转弯时:   v(a,t) ≤ v_rot_max(type) 且 |ω(a,t)| ≤ ω_max(type)
+  原地旋转: 允许当且仅当 active_rotation_allowed(type) = true
+
+位置到达判定 (定位容差):
+  到达目标点 p_target 的条件:  ||p(a,t) - p_target||₂ ≤ ε_pos(type)
+  其中 ε_pos 为定位容差 (config: position_tolerance_m, 默认 0.0 即精确到达)
+
+离散仿真时间步:
+  Δt_sim = desired_dt  (config: 0.05s, 即 20Hz 仿真步长)
+
+路径平滑 (Bezier 曲线):
+  路径由 Bezier 曲线生成，控制权重 = bezier_control_weight (默认1.0)，阶数 = bezier_degree (默认3)。
+  平滑后实际行驶距离 d_actual ≥ d_euclidean，差值由控制权重和转弯曲率决定。
 ```
 
 ### 1.3 电力参数
@@ -71,6 +86,28 @@
 电量约束:
   ∀a, ∀t:  E_remain(a, t) ≥ E_low(type) · E_cap(type)
   当 E_remain ≤ E_low → 必须路由至充电站
+```
+
+#### 仿真平台百分比制电池模型
+
+上述物理模型在仿真平台中以百分比制简化实现，便于实时计算：
+
+| 参数 | 符号 | 默认值 | 说明 |
+|------|------|--------|------|
+| 初始电量 | B_init | 100.0% | 仿真开始时电量百分比 |
+| 待机消耗 | B_idle | 1.0%/min | 无论是否运动的基础消耗 |
+| 空载运动倍率 | M_empty | ×1.5 | 在待机消耗基础上的空载行驶倍率 |
+| 满载运动倍率 | M_loaded | ×2.5 | 在待机消耗基础上的满载行驶倍率 |
+| 充电速率 | B_charge | 10.0%/min | 每分钟充电百分比 |
+| 自动回充 | auto_charge | true | 低电量时是否自动前往充电站 |
+
+```
+百分比制与物理模型的映射:
+  E_cap(type) · Batt% = 实际剩余能量 (kWh)
+  B_idle · E_cap / 60min → e_idle (W/h)
+  M_empty · B_idle · E_cap / (60min · v_avg) → e_travel₀ (W·h/m)
+  M_loaded · B_idle · E_cap / (60min · v_avg) → e_travel₁ (W·h/m)
+  B_charge · E_cap / 60min → P_charge (kW)
 ```
 
 ---
@@ -171,6 +208,25 @@ AGV组合包络计算:
     t_react = 0.2s (系统反应时间)
     a_dec = min(a_dec(typeᵢ), a_dec(typeⱼ))
 
+碰撞包络膨胀 (来自仿真平台):
+  实际碰撞检测使用膨胀后的包络:
+    comb_length_eff = comb_length + 2 · δ_infl
+    comb_width_eff  = comb_width  + 2 · δ_infl
+  其中 δ_infl = collision_inflation_m (默认 0.05m)，为测量/定位误差裕量。
+
+碰撞去抖 (避免瞬态误触发):
+  两车进入碰撞状态后需持续 t_debounce (collision_debounce_window_ms, 默认200ms) 
+  才确认碰撞事件。t_debounce 应与 t_react 协调：t_debounce ≤ t_react。
+
+全局安全因子:
+  所有安全距离可由 α_safe (safety_scale, 默认1.0) 统一缩放:
+    d_min_eff = α_safe · d_min
+  用于在不同实验分布中调节安全紧度。
+
+站点接近判定:
+  AGV 到达站点 s 的条件: dist(a, s) ≤ d_station
+  其中 d_station = station_near_distance_m (默认 0.1m)。
+
 双车道安全间距要求:
   - 同向行驶: d ≥ d_safe
   - 对向行驶: 需在避让点停靠，d ≥ d_min 作为停靠后最小间距
@@ -217,6 +273,30 @@ AGV组合包络计算:
     t(i→j) = t_rot(Δθ) + t_travel(dist(i,j) - d_rot, v_rot_max, v_cruise)
 ```
 
+### 4.3 调度时序参数（来自仿真平台）
+
+| 参数 | config 字段 | 默认值 | 调度含义 |
+|------|------------|--------|----------|
+| 动作执行时间 | `action_time` | 1.0s | 单次 pick/drop 动作的不可中断执行时长 |
+| 订单时效窗口 | `order_timestamp_window_ms` | 10000ms | 订单下达后需在此窗口内分配，超时失效 |
+| 最大发布频率 | `max_publish_hz` | 30.0Hz | MQTT / 状态上报频率上限，对应通信延迟下界 τ_comm ≥ 1/30 ≈ 33ms |
+
+```
+时序约束:
+  动作原子性:
+    若 AGV 在 t₀ 时刻开始动作 act，则在 [t₀, t₀ + action_time] 区间内
+    act 不可被抢占（pick/drop 为原子操作）
+
+  订单时效:
+    订单 o 下达时刻 t_order，若在 t_order + order_timestamp_window_ms 内
+    未被分配任一 AGV，则该订单过期丢弃
+
+  通信延迟:
+    决策到执行的延迟 τ = τ_comm + τ_proc
+    其中 τ_comm ≥ 1 / max_publish_hz (通信延迟下界)
+    τ_proc 为车载控制器处理延迟（可忽略或设为常数）
+```
+
 ---
 
 ## 5. 约束汇总：融入MDP奖励函数
@@ -247,6 +327,15 @@ AGV组合包络计算:
 约束类别 C₅: 通道合规约束
   ∀a, ∀e:  comb_width(a) ≤ max_clearance(e)
   ∀a, ∀e:  遵守 direction(e)
+
+约束类别 C₆: 时序约束 (来自仿真平台 §4.3)
+  ∀a, action act:  [t_start(act), t_start(act) + action_time] 不可抢占
+  ∀order o:  若 t_assign > t_order + order_timestamp_window_ms 则订单丢弃
+  ∀decision→exec:  τ_latency ≥ 1 / max_publish_hz
+
+约束类别 C₇: 定位与路径平滑约束
+  ∀a, target:  到达判定需满足 ||pos(a) - target|| ≤ ε_pos
+  ∀a, path:    d_actual ≥ d_euclidean (Bezier 平滑引入路径增量)
 ```
 
 ### 5.2 融入奖励函数
@@ -262,11 +351,12 @@ R = -[
   + w₅ · Σ max(0, E_low - E_remain)                      (低电量惩罚)
   + w₆ · 任务完成时间(makespan)                            (整体效率)
   + w₇ · Σ 异常负载旋转次数 · I[侵占邻道]                  (异常装载风险)
+  + w₈ · Σ I[订单超时丢弃]                                (订单时效惩罚, §4.3)
 ]
 
 权重设置 (归一化后):
-  w₁:w₂:w₃:w₄:w₅:w₆:w₇ ≈ 1.0:0.8:0.5:2.0:5.0:0.3:3.0
-  冲突惩罚、低电量、异常装载占用高权重 → 安全优先
+  w₁:w₂:w₃:w₄:w₅:w₆:w₇:w₈ ≈ 1.0:0.8:0.5:2.0:5.0:0.3:3.0:4.0
+  冲突惩罚、低电量、异常装载、订单超时占高权重 → 安全+时效优先
 ```
 
 ---
@@ -315,8 +405,43 @@ Layer 5 — 异常负载掩码:
 | D_test5 不同仓库尺寸 | 通道拓扑 + 路径长度变化 | 电量约束"有效范围"改变 |
 | D_test6 不同AGV数量 | 碰撞掩码维度线性增长 | 解码器需处理变长联合动作空间 |
 | **新增 D_test7** | **异常负载比例** (0%→30%) | Layer 5 掩码激活频率变化 |
+| **新增 D_test8** | **安全紧度因子** α_safe (0.5→2.0) | 碰撞/等待频率非线性变化；保守 vs 激进策略切换 |
+| **新增 D_test9** | **订单时效窗口** (5s→30s) + **通信延迟** (33ms→200ms) | 实时性要求变化；延迟容忍度影响决策前瞻性 |
 
 ---
 
 > **状态：可作为 §3 问题建模 + §4.4.3 可行掩码的素材**  
-> 建议新增测试分布 D_test7（异常负载比例），增强实验覆盖面
+> 建议新增测试分布 D_test7（异常负载比例）、D_test8（安全紧度）、D_test9（时序参数），增强实验覆盖面
+
+---
+
+## 8. 仿真平台参数 → 约束模型映射总表
+
+以下参数全部来自 `SimAGV/config.yaml`，仅保留对调度约束建模有实际影响的参数（已剔除纯渲染/缓存/调试类参数）。
+
+| config.yaml 字段 | 默认值 | 约束模型映射 | 所在章节 |
+|---|---|---|---|
+| `factsheet.width` / `length` | 0.745 / 1.03 m | Type L 实例化尺寸 | §1.1 |
+| `speed` | 2.0 | v_max (L型) | §1.2 |
+| `active_max_rotation_speed` | 1.0 | ω_max (L型) | §1.2 |
+| `active_rotation_allowed` | true | 原地旋转可用性 | §1.2 |
+| `position_tolerance_m` | 0.0 | ε_pos 定位容差 | §1.2 |
+| `desired_dt` | 0.05 | Δt_sim 离散时间步 | §1.2 |
+| `bezier_control_weight` | 1.0 | 路径平滑 → d_actual 增量 | §1.2 |
+| `bezier_degree` | 3.0 | 路径平滑阶数 | §1.2 |
+| `battery_default` | 100.0 | B_init (初始电量%) | §1.3 附 |
+| `battery_idle_drain_per_min` | 1.0 | B_idle → e_idle 映射 | §1.3 附 |
+| `battery_move_empty_multiplier` | 1.5 | M_empty → e_travel₀ 映射 | §1.3 附 |
+| `battery_move_loaded_multiplier` | 2.5 | M_loaded → e_travel₁ 映射 | §1.3 附 |
+| `battery_charge_per_min` | 10.0 | B_charge → P_charge 映射 | §1.3 附 |
+| `automatic_charging` | true | 自动回充开关 | §1.3 附 |
+| `collision_inflation_m` | 0.05 | δ_infl 包络膨胀裕量 | §3.3 |
+| `collision_debounce_window_ms` | 200 | t_debounce (≤ t_react) | §3.3 |
+| `safety_scale` | 1.0 | α_safe 全局安全缩放 | §3.3 |
+| `station_near_distance_m` | 0.1 | d_station 站点到达判定 | §3.3 |
+| `action_time` | 1.0 | 动作原子执行时长 | §4.3 |
+| `order_timestamp_window_ms` | 10000 | 订单时效窗口 | §4.3 |
+| `max_publish_hz` | 30.0 | τ_comm ≥ 1/f 通信延迟 | §4.3 |
+
+> **已剔除的参数**（仅作用于渲染/缓存/调试，不影响调度约束）：  
+> `visualization_frequency`, `state_frequency`, `connection_frequency`, `factsheet_frequency`, `frontend_poll_interval_ms`, `other_visualization_stale_ms`, `trace_capacity`, `order_identity_cache_max`, `radar_*` (全部雷达参数), `open_loop_translate_dir_*`, `collision_grid_cell_size_m`

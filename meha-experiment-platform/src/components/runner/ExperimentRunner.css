@@ -1,0 +1,36 @@
+.experiment-runner__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.experiment-runner__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.experiment-runner__col--selector {
+  position: sticky;
+  top: var(--space-4);
+  max-height: calc(100vh - var(--topbar-height) - var(--archstrip-height) - var(--space-8));
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+
+.experiment-runner__runid {
+  font-size: var(--text-xs);
+  color: var(--ink-faint);
+}
+
+@media (max-width: 1024px) {
+  .experiment-runner__grid {
+    grid-template-columns: 1fr;
+  }
+  .experiment-runner__col--selector {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}

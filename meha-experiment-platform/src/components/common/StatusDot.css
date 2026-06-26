@@ -1,0 +1,44 @@
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.status-dot--online { background-color: var(--sage); }
+.status-dot--idle   { background-color: var(--ink-faint); }
+.status-dot--busy   { background-color: var(--terracotta); }
+.status-dot--error  { background-color: var(--terracotta); }
+.status-dot--off    { background-color: var(--rule-strong); }
+
+.status-dot--pulse {
+  position: relative;
+}
+.status-dot--pulse::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  color: inherit;
+  background-color: transparent;
+  opacity: 0.6;
+  animation: status-dot-ping 1.6s var(--ease-out) infinite;
+}
+
+.status-dot--pulse.status-dot--busy::after,
+.status-dot--pulse.status-dot--error::after {
+  color: var(--terracotta);
+}
+
+@keyframes status-dot-ping {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  80%  { transform: scale(1.6); opacity: 0;   }
+  100% { transform: scale(1.6); opacity: 0;   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot--pulse::after { animation: none; opacity: 0; }
+}

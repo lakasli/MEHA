@@ -1,0 +1,103 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(0.5px);
+}
+
+/* ---- Primary: terracotta fill, used for the one main action per region ---- */
+.btn--primary {
+  background-color: var(--terracotta);
+  color: var(--ink-on-accent);
+  border-color: var(--terracotta);
+}
+.btn--primary:not(:disabled):hover {
+  background-color: #a44e31;
+  border-color: #a44e31;
+}
+
+/* ---- Secondary: dark ink fill, used for default actions ---- */
+.btn--secondary {
+  background-color: var(--ink-deep);
+  color: var(--canvas);
+  border-color: var(--ink-deep);
+}
+.btn--secondary:not(:disabled):hover {
+  background-color: #1a1612;
+  border-color: #1a1612;
+}
+
+/* ---- Ghost: hairline outline on surface ---- */
+.btn--ghost {
+  background-color: transparent;
+  color: var(--ink);
+  border-color: var(--rule-strong);
+}
+.btn--ghost:not(:disabled):hover {
+  background-color: var(--surface-sunk);
+  border-color: var(--ink-faint);
+}
+
+/* ---- Danger: ember-toned outline ---- */
+.btn--danger {
+  background-color: transparent;
+  color: var(--terracotta);
+  border-color: var(--terracotta-soft);
+}
+.btn--danger:not(:disabled):hover {
+  background-color: var(--terracotta-wash);
+  border-color: var(--terracotta);
+}
+
+/* ---- Loading state ---- */
+.btn--loading {
+  cursor: progress;
+}
+
+.btn__spinner {
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: btn-spin 0.7s linear infinite;
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+
+}
+
+.btn__icon {
+  display: inline-flex;
+  align-items: center;
+  width: 14px;
+  height: 14px;
+}
+
+.btn__label {
+  font-feature-settings: "cv11";
+}

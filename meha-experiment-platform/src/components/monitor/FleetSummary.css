@@ -1,0 +1,70 @@
+/* ============================================================
+   FleetSummary — five-cell stat strip.
+   Editorial: each cell reads like a ledger entry — eyebrow label,
+   big mono number, small detail. Tone conveyed through the label
+   color, not background fills.
+   ============================================================ */
+
+.fleet-summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.fleet-summary__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-4) var(--space-4);
+  border-right: 1px solid var(--rule);
+  min-width: 0;
+}
+
+.fleet-summary__cell:last-child {
+  border-right: none;
+}
+
+.fleet-summary__label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--ink-faint);
+}
+
+.fleet-summary__value {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+  line-height: 1;
+}
+
+.fleet-summary__detail {
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+}
+
+/* Tone — only the value changes color, the cell stays quiet */
+.fleet-summary__cell--active .fleet-summary__value { color: var(--terracotta); }
+.fleet-summary__cell--warning .fleet-summary__value { color: var(--ember); }
+.fleet-summary__cell--error .fleet-summary__value { color: var(--terracotta); }
+.fleet-summary__cell--done .fleet-summary__value { color: var(--sage); }
+.fleet-summary__cell--neutral .fleet-summary__value { color: var(--ink); }
+
+/* ---- Responsive: collapse to 2-column on small screens ---- */
+@media (max-width: 720px) {
+  .fleet-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .fleet-summary__cell {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .fleet-summary__cell:nth-child(2n) {
+    border-right: none;
+  }
+}

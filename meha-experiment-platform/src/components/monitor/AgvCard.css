@@ -1,0 +1,191 @@
+/* ============================================================
+   AgvCard — single AGV status card.
+   Editorial restraint: a single hairline rule under the head,
+   terracotta tint only on executing cards (subtle left wash),
+   mono numerals for telemetry.
+   ============================================================ */
+
+.agv-card {
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.agv-card:hover {
+  border-color: var(--rule-strong);
+}
+
+/* Mode-tinted left edge — terracotta for executing, ember for error */
+.agv-card--executing {
+  border-left: 2px solid var(--terracotta);
+}
+
+.agv-card--error {
+  border-left: 2px solid var(--terracotta);
+  background-color: var(--terracotta-wash);
+}
+
+.agv-card--charging {
+  border-left: 2px solid var(--sage);
+}
+
+.agv-card--idle,
+.agv-card--offline {
+  border-left: 2px solid var(--rule);
+}
+
+/* ---- Header ---- */
+.agv-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.agv-card__label {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 500;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink);
+}
+
+/* ---- Stats grid (definition list) ---- */
+.agv-card__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+.agv-card__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.agv-card__stat dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--ink-faint);
+}
+
+.agv-card__stat dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agv-card__heading {
+  color: var(--ink-faint);
+  font-size: var(--text-xs);
+}
+
+.agv-card__unit {
+  color: var(--ink-faint);
+  font-size: 10px;
+}
+
+/* ---- Battery bar ---- */
+.agv-card__battery {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agv-card__battery-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.agv-card__battery-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--ink-faint);
+}
+
+.agv-card__battery-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.agv-card__battery-bar {
+  height: 4px;
+  background-color: var(--surface-sunk);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.agv-card__battery-fill {
+  display: block;
+  height: 100%;
+  background-color: var(--sage);
+  transition: width var(--duration-slow) var(--ease-out);
+}
+
+.agv-card__battery-bar--mid .agv-card__battery-fill {
+  background-color: var(--ember);
+}
+
+.agv-card__battery-bar--low .agv-card__battery-fill {
+  background-color: var(--terracotta);
+}
+
+/* ---- Active order footer ---- */
+.agv-card__order {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+.agv-card__order-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--ink-faint);
+}
+
+.agv-card__order-id {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--terracotta);
+  letter-spacing: 0;
+}
+
+.agv-card__error {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  color: var(--terracotta);
+  background-color: var(--terracotta-wash);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--terracotta);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 720px) {
+  .agv-card__stats {
+    grid-template-columns: 1fr;
+  }
+}

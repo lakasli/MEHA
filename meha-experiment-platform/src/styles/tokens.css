@@ -1,0 +1,107 @@
+/* ============================================================
+   MEHA Experiment Platform — Design Tokens
+   Anthropic-inspired editorial palette: warm cream canvas,
+   terracotta accent used only for active/running state.
+   ============================================================ */
+
+:root {
+  /* ---- Color: surfaces ---- */
+  --canvas: #f4f1ea;       /* page background, warm cream */
+  --surface: #faf7f1;      /* card / panel raised surface */
+  --surface-sunk: #ece7db; /* recessed area (input wells, table headers) */
+  --overlay: #ffffff;      /* pure white for popover/menu layers */
+
+  /* ---- Color: ink ---- */
+  --ink: #1f1b17;          /* primary text, warm near-black */
+  --ink-muted: #6b6258;    /* secondary text, warm taupe */
+  --ink-faint: #a39a8c;    /* tertiary text, hint/caption */
+  --ink-on-accent: #fdfaf3;/* text on terracotta fills */
+
+  /* ---- Color: structure ---- */
+  --rule: #d8d1c3;         /* hairline dividers, default borders */
+  --rule-strong: #b9b0a0;  /* heavier dividers, table outer */
+
+  /* ---- Color: accents (used sparingly) ---- */
+  --terracotta: #b85c3c;   /* active/selected/running — signature accent */
+  --terracotta-soft: #d99a7d; /* hover tint, gentle highlight */
+  --terracotta-wash: #f3e0d6;/* subtle background fill for selected rows */
+  --sage: #6b7f6e;         /* completed / inbound / success */
+  --sage-soft: #c5d2c6;
+  --ember: #c2894a;        /* warning / in-progress highlight */
+  --ember-soft: #e8c896;
+  --ink-deep: #2a241f;     /* dark fill for primary buttons */
+
+  /* ---- Typography ---- */
+  --font-display: "Fraunces", "Source Serif 4", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+
+  /* type scale — editorial, generous */
+  --text-xs: 0.75rem;    /* 12px — caption */
+  --text-sm: 0.875rem;   /* 14px — secondary UI */
+  --text-base: 0.9375rem;/* 15px — body */
+  --text-md: 1.0625rem;  /* 17px — lead */
+  --text-lg: 1.375rem;   /* 22px — section heading */
+  --text-xl: 1.75rem;    /* 28px — display */
+  --text-2xl: 2.5rem;    /* 40px — hero */
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.55;
+  --leading-loose: 1.7;
+
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+  --tracking-caps: 0.14em; /* for small caps eyebrows */
+
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ---- Radii — restrained, not bulbous ---- */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-pill: 999px;
+
+  /* ---- Shadows — barely there, warm-toned ---- */
+  --shadow-sm: 0 1px 2px rgba(31, 27, 23, 0.04), 0 1px 1px rgba(31, 27, 23, 0.03);
+  --shadow-md: 0 4px 12px rgba(31, 27, 23, 0.06), 0 2px 4px rgba(31, 27, 23, 0.04);
+  --shadow-lg: 0 12px 32px rgba(31, 27, 23, 0.08), 0 4px 8px rgba(31, 27, 23, 0.04);
+
+  /* ---- Layout ---- */
+  --sidebar-width: 248px;
+  --topbar-height: 56px;
+  --archstrip-height: 44px;
+  --content-max: 1280px;
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 360ms;
+
+  /* ---- Z-index ---- */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-overlay: 1000;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Hold to light theme — editorial palette is the point.
+     Override only if explicitly needed in future. */
+  :root {
+    color-scheme: light;
+  }
+}
